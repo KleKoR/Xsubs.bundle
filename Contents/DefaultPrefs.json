@@ -1,0 +1,16 @@
+[
+  {
+    "id": "xsubs.username",
+    "label": "X-Subs Username",
+    "type": "text",
+    "default": ""
+  },
+  {
+    "id": "xsubs.password",
+    "label": "X-Subs Password",
+    "type": "text",
+    "option": "hidden",
+    "default": "",
+    "secure": "true"
+  }
+]

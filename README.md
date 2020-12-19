@@ -5,7 +5,7 @@ Greek subtitles agent plugin for Plex Media Server using the Xsubs.tv site.
 
 ## Installation
 
-* Grab the [latest release](https://github.com/pannal/Xsubs.bundle/releases/latest)
+* Grab the [latest release](https://github.com/KleKoR/Xsubs.bundle/releases/latest)
 * unpack it
 * place the `Xsubs.bundle` folder inside Plug-ins folder, Windows: `C:\Users\{user}\AppData\Local\Plex Media Server\Plug-ins\`, `~/Library/Application Support/Plex Media Server/Plug-ins/`
 * restart your Plex Media Server.

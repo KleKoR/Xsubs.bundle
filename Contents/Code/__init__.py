@@ -61,6 +61,9 @@ def getSubUrl(data):
 
     elem = HTML.ElementFromURL(seriesUrl)    
     subpages = elem.xpath("//series_group[@ssnnum='"+data.season+"']/@ssnid")
+    if len(subpages)==0:
+        Log("Couldn't find season %s in X-Subs." % data.season)
+        return
 
     Log("Retrieving Subtitles")
     ssnUrl = 'http://xsubs.tv/series/'+str(srid)+'/'+subpages[0]+'.xml'
@@ -70,6 +73,8 @@ def getSubUrl(data):
     Log("Found %d subtitles" % len(subsElements))
     Log("Searching subtitles for source: %s | resolution: %s | release_group: %s | duration: %s" % (data.source, data.resolution, data.release_group, data.duration))
     srs = map(lambda x: sr.parse(HTML.StringFromElement(x)),subsElements)
+    for srf in srs:
+        Log("rlsid: %s | team: %s | fmt: %s  | hits: %s | duration: %s" % (srf.rlsid, srf.team, srf.fmt, srf.hits, srf.duration))
     
     Log("Searching explicit subtitle results")
     srs_filterd = filter(lambda x: (data.source in x.fmt.lower() and data.resolution in x.fmt.lower() and data.release_group in x.team.lower() and data.duration==x.duration)  ,srs)
@@ -85,6 +90,14 @@ def getSubUrl(data):
         Log("Found %d fuzzy matching subtitles" % len(srs_filterd))
         for srf in srs_filterd:
             Log("rlsid: %s | team: %s | fmt: %s  | hits: %s | duration: %s" % (srf.rlsid, srf.team, srf.fmt, srf.hits, srf.duration))
+    if len(srs_filterd) > 0:
+        return 'http://xsubs.tv/xthru/getsub/'+ srs_filterd[0].rlsid
+    Log("Searching only by source (Blu-ray, Web-dl, etc) subtitle results")
+    srs_filterd = filter(lambda x: (data.source in x.fmt.lower()) ,srs)
+    srs_filterd.sort(key=lambda x: x.hits, reverse=True)
+    Log("Found %d only by source (Blu-ray, Web-dl, etc) matching subtitles" % len(srs_filterd))
+    for srf in srs_filterd:
+        Log("rlsid: %s | team: %s | fmt: %s  | hits: %s | duration: %s" % (srf.rlsid, srf.team, srf.fmt, srf.hits, srf.duration))
     if len(srs_filterd) > 0:
         return 'http://xsubs.tv/xthru/getsub/'+ srs_filterd[0].rlsid
     return ""
@@ -214,6 +227,8 @@ class XsubsSubtitlesAgentTvShows(Agent.TV_Shows):
                             Log("X-Subs account credentials has not been set.")
 
                         RetrieveSeriesList()
+                        if "screen_size" not in guess:
+                            guess["screen_size"] = "480p"
 
                         episode_data = EpisodeData(media.title, season,episode, part.duration ,guess["screen_size"],guess["source"],guess["release_group"] )
                         subUrl = getSubUrl(episode_data)
